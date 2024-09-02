@@ -276,6 +276,7 @@ def navigate_with_retry(page, url, timeout, retries, wait_until, post_response_w
 def main(args):
     browser = None
     playwright = None
+    processing_complete = False
     try:
         signal.signal(signal.SIGINT, signal_handler)
   
