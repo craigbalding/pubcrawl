@@ -394,12 +394,6 @@ def main(args):
     
         write_output(output, args.output_file, args.output_format)
 
-        # Print error summary to stderr
-        print("\nError Summary:", file=sys.stderr)
-        print(f"Cloudflare protection encounters: {error_counts['cloudflare']}", file=sys.stderr)
-        print(f"Missing content errors: {error_counts['content_missing']}", file=sys.stderr)
-        print(f"Other errors: {error_counts['other']}", file=sys.stderr)
-
     except KeyboardInterrupt:
         print("\nProcess interrupted by user. Cleaning up...", file=sys.stderr)
     except Exception as e:
