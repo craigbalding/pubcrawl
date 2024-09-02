@@ -116,16 +116,6 @@ The tool generates output in JSON format (default) or CSV format. The JSON outpu
 - Captured responses matching the specified URL pattern
 - Error summary (Cloudflare protection encounters, missing content errors, other errors)
 
-The `first_request_time` in the metadata now includes both a Unix timestamp and an ISO 8601 formatted date-time string:
+## Questions?  Bug reports?
 
-```json
-"first_request_time": {
-    "unix": 1625097600.123456,
-    "iso": "2021-07-01T12:00:00.123456"
-}
-```
-
-## Note
-
-This tool is designed for educational and ethical use only. Always respect website terms of service and robots.txt files when scraping. Use responsibly and consider the load your scraping might place on the target servers.
-
+Open an Issue with details.
