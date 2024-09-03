@@ -274,10 +274,32 @@ def navigate_with_retry(page, url, timeout, retries, wait_until, post_response_w
                 return False
 
 def run_pubcrawl(url, url_pattern, **kwargs):
+    default_args = {
+        'debug': False,
+        'output_file': None,
+        'output_format': 'json',
+        'screen_size': '1440x900',
+        'timeout': 20000,
+        'retries': 3,
+        'wait_until': 'networkidle',
+        'content_limit': 256,
+        'include_headers': False,
+        'include_tls': False,
+        'include_binary': False,
+        'user_agent': None,
+        'proxy': None,
+        'post_response_wait': None,
+        'save_profile': None,
+        'profile': None
+    }
+
+    # Update default arguments with provided kwargs
+    default_args.update(kwargs)
+
     args = argparse.Namespace(
         url=url,
         url_pattern=url_pattern,
-        **kwargs
+        **default_args
     )
     
     browser = None

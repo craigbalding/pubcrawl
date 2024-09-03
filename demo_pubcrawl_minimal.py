@@ -16,5 +16,13 @@ def main():
         print(f"Number of responses captured: {len(result['responses'])}")
         print(f"Total bytes received: {result['metadata']['total_bytes_received']}")
 
+    # You can also override defaults if needed:
+    # result = run_pubcrawl(
+    #     url="https://example.com",
+    #     url_pattern=".*",
+    #     debug=True,
+    #     content_limit=1000
+    # )
+
 if __name__ == "__main__":
     main()
