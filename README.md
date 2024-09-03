@@ -123,6 +123,25 @@ In minimal mode, the output is a summary including:
 - Total bytes received
 - A brief summary of each response (URL, status, content length)
 
-## Questions?  Bug reports?
+## Advanced Usage
+
+### Filtering responses by IP
+
+You can chain PubCrawl with `jq` and `grep` to identify responses from host IPs that are not in your scope:
+
+```bash
+pubcrawl https://example.com ".*" | \
+jq -c '.responses[] | {url: .matched_url, status: .status, ip: .server_ip}' | \
+grep -vFf scope.ips
+```
+
+This command will:
+1. Run PubCrawl on https://example.com, capturing all URLs
+2. Use `jq` to extract the URL, status, and server IP for each response
+3. Use `grep` to filter out any responses with IPs listed in the `scope.ips` file
+
+Make sure to create a `scope.ips` file with one IP address per line for the hosts that are in scope.
+
+## Questions? Bug reports?
 
 Open an Issue with details.
