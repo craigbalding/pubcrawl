@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 from pubcrawl.main import run_pubcrawl
 
 def main():
@@ -27,9 +28,7 @@ def main():
     if isinstance(result, dict) and 'error' in result:
         print(f"Error: {result['error']}")
     else:
-        print("Scraping completed successfully.")
-        print(f"Number of responses captured: {len(result['responses'])}")
-        print(f"Total bytes received: {result['metadata']['total_bytes_received']}")
+        print(json.dumps(result, indent=2))
 
 if __name__ == "__main__":
     main()
