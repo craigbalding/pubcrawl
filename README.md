@@ -76,6 +76,40 @@ print(f"Total bytes received: {result['metadata']['total_bytes_received']}")
 
 For a complete example, see the `demo_pubcrawl.py` script in the repository.
 
+### Demo Script Usage
+
+The `demo_pubcrawl.py` script provides a convenient way to test PubCrawl with various options:
+
+```
+python demo_pubcrawl.py [options]
+```
+
+Options:
+- `--debug`: Enable debug mode (opens browser for inspection)
+- `--minimal`: Run minimal version with summarized output
+
+Examples:
+
+1. Full output:
+   ```
+   python demo_pubcrawl.py
+   ```
+
+2. Minimal output:
+   ```
+   python demo_pubcrawl.py --minimal
+   ```
+
+3. Debug mode with full output:
+   ```
+   python demo_pubcrawl.py --debug
+   ```
+
+4. Debug mode with minimal output:
+   ```
+   python demo_pubcrawl.py --minimal --debug
+   ```
+
 ## Output
 
 The tool generates output in JSON format (default) or CSV format. The JSON output includes:
@@ -83,6 +117,11 @@ The tool generates output in JSON format (default) or CSV format. The JSON outpu
 - Metadata about the scraping session (URL, user agent, screen size, etc.)
 - Captured responses matching the specified URL pattern
 - Error summary (Cloudflare protection encounters, missing content errors, other errors)
+
+In minimal mode, the output is a summary including:
+- Number of responses captured
+- Total bytes received
+- A brief summary of each response (URL, status, content length)
 
 ## Questions?  Bug reports?
 
