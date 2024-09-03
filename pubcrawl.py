@@ -273,25 +273,27 @@ def navigate_with_retry(page, url, timeout, retries, wait_until, post_response_w
                 print(f"Error: Max retries reached. Unable to load the page.", file=sys.stderr)
                 return False
 
-def main(args):
+def run_pubcrawl(url, url_pattern, **kwargs):
+    args = argparse.Namespace(
+        url=url,
+        url_pattern=url_pattern,
+        **kwargs
+    )
+    
     browser = None
     playwright = None
     processing_complete = False
     try:
-        signal.signal(signal.SIGINT, signal_handler)
-  
         if args.profile:
             profile = load_profile(args.profile)
             args = merge_args_with_profile(args, profile)
         
         if args.save_profile:
             save_profile(args, args.save_profile)
-            print("Profile saved. Exiting.")
-            return
+            return {"message": "Profile saved. Exiting."}
         
         if not args.url or not args.url_pattern:
-            print("Error: URL and URL pattern are required. Use --help for usage information.", file=sys.stderr)
-            return
+            return {"error": "URL and URL pattern are required."}
 
         browser, page, actual_user_agent, playwright = setup_browser(args)
 
@@ -339,35 +341,28 @@ def main(args):
 
         page.on("response", response_handler)
 
-        # Set default wait_until option to 'networkidle'
         default_wait_until = 'networkidle'
+        wait_until_options = args.wait_until if args.wait_until else default_wait_until
 
-        # Check if the user provided the --wait_until option
-        if args.wait_until:
-            # Parse wait_until options provided by the user
-            wait_until_options = [option.strip() for option in args.wait_until.split(',')]
-            valid_options = {'domcontentloaded', 'load', 'networkidle', 'commit'}
-            wait_until_options = [option for option in wait_until_options if option in valid_options]
+        if isinstance(wait_until_options, str):
+            wait_until_options = [option.strip() for option in wait_until_options.split(',')]
+        valid_options = {'domcontentloaded', 'load', 'networkidle', 'commit'}
+        wait_until_options = [option for option in wait_until_options if option in valid_options]
 
-            if not wait_until_options:
-                print("Warning: No valid wait_until options provided. Using default 'networkidle'.")
-                wait_until_options = default_wait_until
-            elif len(wait_until_options) == 1:
-                # Convert the list with one valid option to a single string
-                wait_until_options = wait_until_options[0]
-        else:
-            # If no --wait_until is provided, use the default
+        if not wait_until_options:
+            logging.warning("No valid wait_until options provided. Using default 'networkidle'.")
             wait_until_options = default_wait_until
+        elif len(wait_until_options) == 1:
+            wait_until_options = wait_until_options[0]
 
         post_response_wait = args.post_response_wait or random.uniform(0.7, 1.3)
         
         if not navigate_with_retry(page, args.url, args.timeout, args.retries, wait_until_options, post_response_wait, metadata):
-            return
+            return {"error": "Failed to navigate to the specified URL."}
 
         navigation_complete_time = time.time()
         processing_complete = False
 
-        # Wait for all responses to be processed
         timeout = time.time() + 60  # 60 seconds timeout
         while not processing_complete:
             if time.time() > timeout:
@@ -387,17 +382,19 @@ def main(args):
             "responses": all_responses
         }
 
-        # Update error summary in metadata
         output["metadata"]["error_summary"]["cloudflare_protection"] = error_counts["cloudflare"]
         output["metadata"]["error_summary"]["missing_content"] = error_counts["content_missing"]
         output["metadata"]["error_summary"]["other_errors"] = error_counts["other"]
     
-        write_output(output, args.output_file, args.output_format)
+        if args.output_file:
+            write_output(output, args.output_file, args.output_format)
+        
+        return output
 
     except KeyboardInterrupt:
-        print("\nProcess interrupted by user. Cleaning up...", file=sys.stderr)
+        return {"error": "Process interrupted by user."}
     except Exception as e:
-        print(f"An error occurred: {str(e)}", file=sys.stderr)
+        return {"error": f"An error occurred: {str(e)}"}
     finally:
         if processing_complete:
             logging.info("All responses processed. Closing browser and stopping Playwright")
@@ -408,17 +405,28 @@ def main(args):
             try:
                 browser.close()
             except Exception as e:
-                print(f"Error closing browser: {str(e)}", file=sys.stderr)
+                logging.error(f"Error closing browser: {str(e)}")
         if playwright:
             try:
                 playwright.stop()
             except Exception as e:
-                print(f"Error stopping Playwright: {str(e)}", file=sys.stderr)
+                logging.error(f"Error stopping Playwright: {str(e)}")
 
-if __name__ == "__main__":
+def main():
     parser = parse_arguments()
     args = parser.parse_args()
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
-    main(args)
+    
+    result = run_pubcrawl(**vars(args))
+    if isinstance(result, dict) and 'error' in result:
+        print(result['error'], file=sys.stderr)
+        sys.exit(1)
+    elif isinstance(result, dict) and 'message' in result:
+        print(result['message'])
+    else:
+        print(json.dumps(result, indent=2))
+
+if __name__ == "__main__":
+    main()
