@@ -15,6 +15,13 @@ def main():
         print("Scraping completed successfully.")
         print(f"Number of responses captured: {len(result['responses'])}")
         print(f"Total bytes received: {result['metadata']['total_bytes_received']}")
+        
+        print("\nResponse summaries:")
+        for response in result['responses']:
+            print(f"URL: {response['matched_url']}")
+            print(f"Status: {response['status']}")
+            print(f"Content Length: {response['content_length']}")
+            print("---")
 
     # You can also override defaults if needed:
     # result = run_pubcrawl(
