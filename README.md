@@ -130,17 +130,19 @@ In minimal mode, the output is a summary including:
 You can chain PubCrawl with `jq` and `grep` to identify responses from host IPs that are not in your scope:
 
 ```bash
-pubcrawl https://example.com ".*" | \
-jq -c '.responses[] | {url: .matched_url, status: .status, ip: .server_ip}' | \
-grep -vFf scope.ips
+pubcrawl https://example.com ".*" --output-file - | jq -c '.responses[] | {url: .matched_url, status: .status, ip: .server_ip}' | grep -vFf scope.ips
 ```
 
 This command will:
-1. Run PubCrawl on https://example.com, capturing all URLs
+1. Run PubCrawl on https://example.com, capturing all URLs and outputting to stdout
 2. Use `jq` to extract the URL, status, and server IP for each response
 3. Use `grep` to filter out any responses with IPs listed in the `scope.ips` file
 
-Make sure to create a `scope.ips` file with one IP address per line for the hosts that are in scope.
+Make sure to create a `scope.ips` file with one IP address per line for the hosts that are in scope. If you don't have a `scope.ips` file or want to see all results, you can omit the `grep` part:
+
+```bash
+pubcrawl https://example.com ".*" --output-file - | jq -c '.responses[] | {url: .matched_url, status: .status, ip: .server_ip}'
+```
 
 ## Questions? Bug reports?
 
