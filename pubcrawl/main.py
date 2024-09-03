@@ -284,11 +284,11 @@ def run_pubcrawl(url, url_pattern, **kwargs):
     playwright = None
     processing_complete = False
     try:
-        if args.profile:
+        if hasattr(args, 'profile') and args.profile:
             profile = load_profile(args.profile)
             args = merge_args_with_profile(args, profile)
         
-        if args.save_profile:
+        if hasattr(args, 'save_profile') and args.save_profile:
             save_profile(args, args.save_profile)
             return {"message": "Profile saved. Exiting."}
         
