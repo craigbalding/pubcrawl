@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from pubcrawl.pubcrawl import run_pubcrawl
+from pubcrawl import run_pubcrawl
 
 def main():
     # Example usage of pubcrawl as a module
