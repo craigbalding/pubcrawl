@@ -14,7 +14,7 @@ setup(
     description="A one-shot CLI tool to scrape a public URL that depends on JavaScript",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/threatprompt/pubcrawl",
+    url="https://github.com/craigbalding/pubcrawl",
     packages=find_packages(),
     install_requires=requirements,
     classifiers=[
