@@ -25,7 +25,7 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'pubcrawl=pubcrawl:main',
+            'pubcrawl=pubcrawl.main:main',
         ],
     },
 )
